@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hncs.mapper.ResultMapper">
+
+    <resultMap type="com.example.hncs.domain.Result" id="ResultResult">
+        <result property="id"    column="id"    />
+        <result property="classname"    column="classname"    />
+        <result property="result"    column="result"    />
+        <result property="testtime"    column="testtime"    />
+        <result property="classid"    column="classid"    />
+        <result property="userid"    column="userid"    />
+        <result property="isdel"    column="isdel"    />
+        <result property="creatid"    column="creatid"    />
+    </resultMap>
+
+    <sql id="selectResultVo">
+        select id, classname, result, testtime, classid, userid, isdel, creatid from result
+    </sql>
+
+    <select id="selectResultList" parameterType="com.example.hncs.domain.Result" resultMap="ResultResult">
+        <include refid="selectResultVo"/>
+        <where>
+            <if test="classname != null  and classname != ''"> and classname like concat('%', #{classname}, '%')</if>
+            <if test="result != null "> and result = #{result}</if>
+            <if test="testtime != null "> and testtime = #{testtime}</if>
+            <if test="classid != null "> and classid = #{classid}</if>
+            <if test="userid != null "> and userid = #{userid}</if>
+            <if test="isdel != null "> and isdel = #{isdel}</if>
+            <if test="creatid != null "> and creatid = #{creatid}</if>
+        </where>
+    </select>
+
+    <select id="selectResultById" parameterType="Long" resultMap="ResultResult">
+        <include refid="selectResultVo"/>
+        where id = #{id}
+    </select>
+    <select id="getClassByRes" resultType="com.example.hncs.domain.Result">
+        SELECT a.id,a.classname,a.result,a.testtime,a.classid,a.userid,a.isdel,a.creatid,b.teachername
+        FROM result a
+        LEFT JOIN class b
+        ON a.classid = b.id AND b.isdel = 0
+        <where>
+            <if test="userid != null "> and userid = #{userid}</if>
+            and a.isdel = 0
+        </where>
+    </select>
+    <select id="selectResultListPage" resultType="com.example.hncs.domain.Result">
+        <include refid="selectResultVo"/>
+        <where>
+            <if test="classname != null  and classname != ''"> and classname like concat('%', #{classname}, '%')</if>
+            <if test="result != null "> and result = #{result}</if>
+            <if test="classid != null "> and classid = #{classid}</if>
+            <if test="userid != null "> and userid = #{userid}</if>
+             and isdel = 0
+        </where>
+    </select>
+
+    <insert id="insertResult" parameterType="com.example.hncs.domain.Result" useGeneratedKeys="true" keyProperty="id">
+        insert into result
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="classname != null">classname,</if>
+            <if test="result != null">result,</if>
+            <if test="testtime != null">testtime,</if>
+            <if test="classid != null">classid,</if>
+            <if test="userid != null">userid,</if>
+            <if test="isdel != null">isdel,</if>
+            <if test="creatid != null">creatid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="classname != null">#{classname},</if>
+            <if test="result != null">#{result},</if>
+            <if test="testtime != null">#{testtime},</if>
+            <if test="classid != null">#{classid},</if>
+            <if test="userid != null">#{userid},</if>
+            <if test="isdel != null">#{isdel},</if>
+            <if test="creatid != null">#{creatid},</if>
+         </trim>
+    </insert>
+
+    <update id="updateResult" parameterType="com.example.hncs.domain.Result">
+        update result
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classname != null">classname = #{classname},</if>
+            <if test="result != null">result = #{result},</if>
+            <if test="testtime != null">testtime = #{testtime},</if>
+            <if test="classid != null">classid = #{classid},</if>
+            <if test="userid != null">userid = #{userid},</if>
+            <if test="isdel != null">isdel = #{isdel},</if>
+            <if test="creatid != null">creatid = #{creatid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteResultById" parameterType="Long">
+        delete from result where id = #{id}
+    </delete>
+
+    <delete id="deleteResultByIds" parameterType="String">
+        update result set isdel = 1 where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

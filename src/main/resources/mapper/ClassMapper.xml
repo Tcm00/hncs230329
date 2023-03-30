@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.hncs.mapper.ClassInfoMapper">
+    
+    <resultMap type="com.example.hncs.domain.ClassInfo" id="ClassResult">
+        <result property="id"    column="id"    />
+        <result property="classname"    column="classname"    />
+        <result property="teachername"    column="teachername"    />
+        <result property="creattime"    column="creattime"    />
+        <result property="isdel"    column="isdel"    />
+        <result property="creatid"    column="creatid"    />
+    </resultMap>
+
+    <sql id="selectClassVo">
+        select id, classname, teachername, creattime, isdel, creatid from class
+    </sql>
+
+    <select id="selectClassList" parameterType="com.example.hncs.domain.ClassInfo" resultMap="ClassResult">
+        <include refid="selectClassVo"/>
+        <where>  
+            <if test="classname != null  and classname != ''"> and classname like concat('%', #{classname}, '%')</if>
+            <if test="teachername != null  and teachername != ''"> and teachername like concat('%', #{teachername}, '%')</if>
+            <if test="creattime != null "> and creattime = #{creattime}</if>
+            <if test="isdel != null "> and isdel = #{isdel}</if>
+            <if test="creatid != null "> and creatid = #{creatid}</if>
+        </where>
+    </select>
+    
+    <select id="selectClassById" parameterType="Long" resultMap="ClassResult">
+        <include refid="selectClassVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectClassListPage" resultType="com.example.hncs.domain.ClassInfo">
+        <include refid="selectClassVo"/>
+        <where>
+            <if test="id != null  and id != ''"> and id = #{id} </if>
+            <if test="classname != null  and classname != ''"> and classname like concat('%', #{classname}, '%')</if>
+            <if test="teachername != null  and teachername != ''"> and teachername like concat('%', #{teachername}, '%')</if>
+            and isdel = 0
+            <if test="creatid != null "> and creatid = #{creatid}</if>
+        </where>
+    </select>
+
+    <insert id="insertClass" parameterType="com.example.hncs.domain.ClassInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into class
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="classname != null">classname,</if>
+            <if test="teachername != null">teachername,</if>
+            <if test="creattime != null">creattime,</if>
+            <if test="isdel != null">isdel,</if>
+            <if test="creatid != null">creatid,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="classname != null">#{classname},</if>
+            <if test="teachername != null">#{teachername},</if>
+            <if test="creattime != null">#{creattime},</if>
+            <if test="isdel != null">#{isdel},</if>
+            <if test="creatid != null">#{creatid},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClass" parameterType="com.example.hncs.domain.ClassInfo">
+        update class
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classname != null">classname = #{classname},</if>
+            <if test="teachername != null">teachername = #{teachername},</if>
+            <if test="creattime != null">creattime = #{creattime},</if>
+            <if test="isdel != null">isdel = #{isdel},</if>
+            <if test="creatid != null">creatid = #{creatid},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteClassById" parameterType="Long">
+        delete from class where id = #{id}
+    </delete>
+
+    <delete id="deleteClassByIds" parameterType="String">
+        delete from class where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
